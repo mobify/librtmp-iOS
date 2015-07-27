@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#  Automatic build script for libssl and libcrypto 
+#  Automatic build script for libssl and libcrypto
 #  for iPhoneOS and iPhoneSimulator
 #
 #  Created by Felix Schulze on 16.12.10.
@@ -38,8 +38,8 @@
 ###########################################################################
 #  Change values here													                            #
 #																	                                    	  #
-VERSION="1.0.1e"													                                #
-SDKVERSION="7.1"														                              #
+VERSION="1.0.2d"													                                #
+SDKVERSION="8.4"														                              #
 #																		                                      #
 ###########################################################################
 #																		                                      #
@@ -72,7 +72,7 @@ if [ ! -e openssl-${VERSION}.tar.gz ]; then
     curl -O http://www.openssl.org/source/openssl-${VERSION}.tar.gz
 else
 	echo "Using openssl-${VERSION}.tar.gz"
-	
+
 	# Remove the source directory if already exist
   rm -rf "${SRCPATH}/openssl-${VERSION}"
 fi
@@ -97,7 +97,7 @@ do
 		sed -ie "s!static volatile sig_atomic_t intr_signal;!static volatile intr_signal;!" "crypto/ui/ui_openssl.c"
 		PLATFORM="iPhoneOS"
 	fi
-	
+
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${SDKVERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -106,7 +106,7 @@ do
 	echo "Please stand by..."
 
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
-	
+
 	OUTPATH="${BUILDPATH}/openssl-${PLATFORM}${SDKVERSION}-${ARCH}.sdk"
 	mkdir -p "${OUTPATH}"
 	LOG="${OUTPATH}/build-openssl-${VERSION}.log"
@@ -119,11 +119,11 @@ do
 
 	# add -isysroot to CC=
 	sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/Platforms/${PLATFORM}.platform/Developer/SDKs/${CROSS_SDK} -miphoneos-version-min=7.0 !" "Makefile"
-  
+
 	make >> "${LOG}" 2>&1
 	make install >> "${LOG}" 2>&1
 	make clean >> "${LOG}" 2>&1
-	
+
 	LIBSSL_REPO+="${OUTPATH}/lib/${LIBSSL} "
   LIBCRYPTO_REPO+="${OUTPATH}/lib/${LIBCRYPTO} "
 done

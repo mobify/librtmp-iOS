@@ -21,7 +21,7 @@
 ###########################################################################
 #  Change values here													                            #
 #																		                                      #
-SDKVERSION="7.1"														                              #
+SDKVERSION="8.4"														                              #
 #																		                                      #
 ###########################################################################
 #																		                                      #
@@ -78,40 +78,40 @@ do
   if [ "${ARCH}" == "i386" ] || [ "${ARCH}" == "x86_64" ];
   then
   	PLATFORM="iPhoneSimulator"
-  else  
+  else
   	PLATFORM="iPhoneOS"
   fi
-  
+
   export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
   export CROSS_SDK="${PLATFORM}${SDKVERSION}.sdk"
   export BUILD_TOOLS="${DEVELOPER}"
-  
+
   echo "Building librtmp for ${PLATFORM} ${SDKVERSION} ${ARCH}"
 	echo "Please wait..."
-	
+
 	# add arch to CC=
 	sed -ie "s!AR=\$(CROSS_COMPILE)ar!AR=/usr/bin/ar!" "Makefile"
 	sed -ie "/CC=\$(CROSS_COMPILE)gcc/d" "Makefile"
 	echo "CC=\$(CROSS_COMPILE)gcc -arch ${ARCH}" >> "Makefile"
-  
-	export CROSS_COMPILE="${DEVELOPER}/usr/bin/"  
+
+	export CROSS_COMPILE="${DEVELOPER}/usr/bin/"
   export XCFLAGS="-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=7.0 -I${INCLUDEPATH} -arch ${ARCH}"
-      
+
   if [ "${ARCH}" == "i386" ] || [ "${ARCH}" == "x86_64" ];
   then
   	export XLDFLAGS="-L${LIBPATH} -arch ${ARCH}"
   else
   	export XLDFLAGS="-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=7.0 -L${LIBPATH} -arch ${ARCH}"
   fi
-  
+
   OUTPATH="${BUILDPATH}/librtmp-${PLATFORM}${SDKVERSION}-${ARCH}.sdk"
   mkdir -p "${OUTPATH}"
   LOG="${OUTPATH}/build-librtmp.log"
-  
-  make SYS=darwin >> "${LOG}" 2>&1  
+
+  make SYS=darwin >> "${LOG}" 2>&1
   make SYS=darwin prefix="${OUTPATH}" install  >> "${LOG}" 2>&1
   make clean >> "${LOG}" 2>&1
-  
+
   LIBRTMP_REPO+="${OUTPATH}/lib/${LIBRTMP} "
 done
 
